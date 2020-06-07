@@ -20,13 +20,21 @@ router.post('/addinfo',userControllers.addinfo)
 
 router.get('/getproduct', productControllers.getproducts)
 
+router.get('/getproducttype', productControllers.getproductstype)
+
 router.get('/getproduct/:id', productControllers.getproductbyid)
 
+router.get('/getproductbytype/:type', productControllers.getproductbytype)
+
 router.post('/createproduct', productControllers.createproduct)
+
+router.post('/createtype', productControllers.createproducttype)
 
 router.post('/editproduct', productControllers.editproduct)
 
 router.post('/deleteproduct', productControllers.deleteproduct)
+
+router.post('/deleteproducttype', productControllers.deleteproducttype)
 
 router.post('/uploadimage', productControllers.uploadimage)
 
@@ -37,6 +45,8 @@ router.post('/clearcart', cartControllers.clearcart)
 router.post('/confirmcart',cartControllers.confirmcart)
 
 router.post('/confirmorder',cartControllers.confirmorder)
+
+router.get('/gettotalorder',cartControllers.gettotalorder)
 
 router.get('/confirmpayment', cartControllers.confirmpayment)
 

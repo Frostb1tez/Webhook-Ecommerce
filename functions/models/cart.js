@@ -117,11 +117,9 @@ class Cart {
         totalPrice: totalPrice
       }, { merge: true })
       await db.collection('so').doc(transactionId).set({
-        saleList: {
-          tokenId: userId,
-          product: product,
-          totalPrice: totalPrice
-        }
+        tokenId: userId,
+        product: product,
+        totalPrice: totalPrice
       }, { merge: true })
     } catch (e) {
       console.log(e)

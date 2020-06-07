@@ -1,5 +1,6 @@
 const Cart = require('../models/cart')
 const Message = require('../models/messegingAPI')
+const Order = require('../models/order')
 
 exports.getcart = async (req,res) => {
   const cart = new Cart(req.body)
@@ -84,4 +85,22 @@ exports.confirmpayment = async (req,res) => {
   const message = new Message()
   await message.pushMessage(`เลขคำสั่งซื้อของคุณคือ: ${data.info.transactionId}`, req.query.userId)
   res.send(data.returnMessage).status(200).end()
+}
+
+exports.gettotalorder = async (req,res) => {
+  const order = new Order()
+  let data = await order.getTotalOrder()
+  if (data) {
+    res.send({
+      status: 200,
+      message: 'success',
+      data: data
+    })
+  } else {
+    res.send({
+      status: 404,
+      message: 'not found orderid',
+      data: data
+    })
+  }
 }

@@ -32,10 +32,43 @@ class Product {
     }
   }
 
+  async gettype () {
+    try {
+      let type = []
+      let typeArr = []
+      let i = 0
+      var querySnapshot = await db.collection('producttype').get()
+      querySnapshot.forEach(doc => {
+        typeArr.push(doc.data())
+        typeArr[i].id = doc.id
+        type.push(typeArr[i])
+        i++
+      })
+      return type
+    } catch (e) {
+      console.log(e)
+      return e
+    }
+  }
+
   async getdatabyid (id) {
     try {
       var d = await db.collection('product').doc(id).get()
       return d.data()
+    } catch (e) {
+      console.log(e)
+      return e
+    }
+  }
+
+  async getdatabytype (type) {
+    let data = []
+    try {
+      let d = await db.collection('product').where('product_type', '==', type).get()
+      d.forEach(v => {
+        data.push(v.data())
+      })
+      return data
     } catch (e) {
       console.log(e)
       return e
@@ -56,7 +89,27 @@ class Product {
           product_image: this.product_image,
           product_detail: this.product_detail,
           product_stock: this.product_stock,
-          timestamp: FieldValue.serverTimestamp()
+          time_created: FieldValue.serverTimestamp(),
+          time_updated: FieldValue.serverTimestamp()
+        },{ merge: true })
+        return true
+      }
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+  }
+
+  async createproducttype () {
+    try {
+      var d = await db.collection('producttype').doc(this.product_type).get()
+      if (d.exists) {
+        return false
+      } else {
+        db.collection('producttype').doc(this.product_type).set({
+          name: this.product_type,
+          time_created: FieldValue.serverTimestamp(),
+          time_updated: FieldValue.serverTimestamp()
         },{ merge: true })
         return true
       }
@@ -76,7 +129,7 @@ class Product {
         product_image: this.product_image,
         product_detail: this.product_detail,
         product_stock: this.product_stock,
-        timestamp: FieldValue.serverTimestamp()
+        time_updated: FieldValue.serverTimestamp()
       })
       return true
     } catch (e) {
@@ -88,6 +141,16 @@ class Product {
   async deleteproduct (id) {
     try {
       db.collection('product').doc(id).delete()
+      return true
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+  }
+
+  async deleteproducttype (id) {
+    try {
+      db.collection('producttype').doc(id).delete()
       return true
     } catch (e) {
       console.log(e)

@@ -26,6 +26,24 @@ exports.getproducts =  async (req, res) => {
   }
 }
 
+exports.getproductstype =  async (req, res) => {
+  const product = new Product(req.body)
+  const data = await product.gettype()
+  if (data) {
+    res.send({
+      status: 200,
+      message: 'success',
+      data: data
+    })
+  } else {
+    res.send({
+      status: 404,
+      message: 'fail',
+      data: data
+    })
+  }
+}
+
 exports.getproductbyid = async (req, res) => {
   const product = new Product(req.body)
   const data = await product.getdatabyid(req.params.id)
@@ -44,10 +62,44 @@ exports.getproductbyid = async (req, res) => {
   }
 }
 
+exports.getproductbytype = async (req, res) => {
+  const product = new Product(req.body)
+  const data = await product.getdatabytype(req.params.type)
+  if (data.length != 0) {
+    res.send({
+      status: 200,
+      message: 'success',
+      data: data
+    })
+  } else {
+    res.send({
+      status: 404,
+      message: 'type not found',
+      data: data
+    })
+  }
+}
+
 exports.createproduct = async (req ,res) =>{
 
   const product = new Product(req.body)
   const data = await product.createproduct()
+  if (data === true) {
+    res.send({
+      status: 200,
+      message: 'success',
+    })
+  } else {
+    res.send({
+      status: 404,
+      message: 'fail',
+    })
+  }
+}
+
+exports.createproducttype = async (req ,res) =>{
+  const product = new Product(req.body)
+  const data = await product.createproducttype()
   if (data === true) {
     res.send({
       status: 200,
@@ -93,6 +145,22 @@ exports.deleteproduct = async (req , res) => {
   }
 }
 
+exports.deleteproducttype = async (req , res) => {
+  const product = new Product(req.body)
+  const data = await product.deleteproducttype(req.body.id)
+  if (data === true) {
+    res.send({
+      status: 200,
+      message: 'success',
+    })
+  } else {
+    res.send({
+      status: 404,
+      message: 'fail',
+    })
+  }
+}
+
 exports.uploadimage = async (req , res) => {
   if (req.method === 'POST') {
     const busboy = new Busboy({ headers: req.headers });
@@ -100,9 +168,10 @@ exports.uploadimage = async (req , res) => {
 
     // This callback will be invoked for each file uploaded
     busboy.on('file', async (fieldname, file, filename, encoding, mimetype) => {
-        console.log(`File [${fieldname}] filename: ${filename}, encoding: ${encoding}, mimetype: ${mimetype}`);
+        // console.log(`File [${fieldname}] filename: ${filename}, encoding: ${encoding}, mimetype: ${mimetype}`);
+        const filepath = path.join(os.tmpdir(), filename)
         uploads[fieldname] = { file: filepath }
-        console.log(`Saving '${fieldname}' to ${filepath}`);
+        // console.log(`Saving '${fieldname}' to ${filepath}`);
         try {
           await this.dofs(file,filepath)
           let d = await bucket.upload(filepath, {

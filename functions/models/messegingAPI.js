@@ -288,7 +288,7 @@ class messegingAPI {
                     "contents": [
                       {
                         "type": "text",
-                        "text": "ที่อยู่จัดส่ง",
+                        "text": "Address",
                         "size": "sm",
                         "color": "#555555"
                       },
@@ -397,24 +397,31 @@ class messegingAPI {
     try {
       let d = await db.collection('users').doc(userId).collection('so').get()
       let orderId = d.docs.map(doc => doc.id)
-      let items = []
-      orderId.forEach(v => {
-        items.push({
-          "type": "action",
-          "action": {
-           "type": "postback",
-           "label": v.toString(),
-           "data": `history/?saleorderId=${v.toString()}`
-          }
+      if (orderId.length !== 0) {
+        let items = []
+        orderId.forEach(v => {
+          items.push({
+            "type": "action",
+            "action": {
+            "type": "postback",
+            "label": v.toString(),
+            "data": `history/?saleorderId=${v.toString()}`
+            }
+          })
         })
-      })
-      return {
-        "type": "text",
-        "text": "นี่คือรายการประวัติการสั่งซื้อของคุณทั้งหมด",
-        "quickReply": {
-         "items": items
+        return {
+          "type": "text",
+          "text": "นี่คือรายการประวัติการสั่งซื้อของคุณทั้งหมด",
+          "quickReply": {
+          "items": items
+          }
         }
-       }
+      } else {
+        return {
+          "type": "text",
+          "text": "ไม่มีประวัติการสั่งซื้อ"
+        }
+      }
     } catch (e) {
       console.log(e)
     }
@@ -422,7 +429,212 @@ class messegingAPI {
   ///////////////////////////////////////////////////////////////////////////////////////////
   async getHistoryDetail (soId, userId) {
     var self = this
-    console.log(soId)
+    const replyToken = self.data.body.events[0].replyToken
+    let content = []
+    try {
+      let contact = await db.collection('users').doc(userId).get()
+      let d = await db.collection('users').doc(userId).collection('so').doc(soId).get()
+      let {firstname,lastname} = contact.data().name
+      let {address,amphoe,district,province,zipcode} = contact.data().address
+      let tel = contact.data().telno.replace("+66","0")
+      let product = d.data().product
+      product.forEach(v => {
+        content.push({
+          "type": "box",
+          "layout": "horizontal",
+          "contents": [
+            {
+              "type": "text",
+              "text": `${v.name} x${v.quantity.toLocaleString()}`,
+              "size": "sm",
+              "color": "#555555",
+              "wrap" : true
+            },
+            {
+              "type": "text",
+              "text": v.price.toLocaleString() + " THB",
+              "size": "sm",
+              "color": "#111111",
+              "align": "end"
+            }
+          ]
+        })
+      })
+      let json = {
+        type: "flex",
+        altText: "รายการสั่งซื้อของคุณ",
+        contents: {
+          "type": "bubble",
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "Quatation Order",
+                "weight": "bold",
+                "color": "#1DB446",
+                "size": "sm"
+              },
+              {
+                "type": "text",
+                "text": "Cheeta Store",
+                "weight": "bold",
+                "size": "xxl",
+                "margin": "md"
+              },
+              {
+                "type": "separator",
+                "margin": "xxl",
+                "color": "#000000"
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "xxl",
+                "spacing": "sm",
+                "contents": content
+              },
+              {
+                "type": "separator",
+                "color": "#000000",
+                "margin": "xxl"
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "xxl",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "TOTAL",
+                        "size": "sm",
+                        "color": "#555555"
+                      },
+                      {
+                        "type": "text",
+                        "text": `${d.data().totalPrice.toLocaleString()} THB`,
+                        "size": "sm",
+                        "color": "#111111",
+                        "align": "end"
+                      }
+                    ],
+                  }
+                ]
+              },
+              {
+                "type": "separator",
+                "color": "#000000",
+                "margin": "xxl"
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "margin": "xxl",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "xxl",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "Contact name",
+                        "color": "#555555",
+                        "size": "sm"
+                      },
+                      {
+                        "type": "text",
+                        "text": `${firstname} ${lastname}`,
+                        "wrap": true,
+                        "color": "#111111",
+                        "size": "sm",
+                        "align": "end"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "xxl",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "Address",
+                        "size": "sm",
+                        "color": "#555555"
+                      },
+                      {
+                        "type": "text",
+                        "text": `${address} แขวง${district} เขต${amphoe} จังหวัด${province} ${zipcode}`,
+                        "wrap": true,
+                        "size": "sm",
+                        "color": "#111111",
+                        "align": "end"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "margin": "xxl",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "Phone number",
+                        "size": "sm",
+                        "color": "#555555"
+                      },
+                      {
+                        "type": "text",
+                        "text": tel,
+                        "size": "sm",
+                        "color": "#111111",
+                        "align": "end"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "ORDER ID",
+                        "size": "xs",
+                        "color": "#aaaaaa",
+                        "flex": 0
+                      },
+                      {
+                        "type": "text",
+                        "text": soId.toString(),
+                        "color": "#aaaaaa",
+                        "size": "xs",
+                        "margin": "xxl",
+                        "align": "end"
+                      }
+                    ],
+                    "margin": "xxl"
+                  }
+                ]
+              }
+            ]
+          },
+          "styles": {
+            "footer": {
+              "separator": true
+            }
+          }
+        }
+      }
+      self.sendPayload(json,replyToken)
+    } catch (e) {
+      console.log(e)
+    }
   } 
   ///////////////////////////////////////////////////////////////////////////////////////////
   async reservePayment (orderId, userId) {
@@ -463,7 +675,7 @@ class messegingAPI {
           }
         ],
         redirectUrls: {
-          confirmUrl: `https://92bc9f55.ngrok.io/siamproject-dbffa/us-central1/api/confirmpayment?userId=${userId}&orderId=${orderId}&amount=${totalPrice}&keys=${paymentKey}`,
+          confirmUrl: `https://852aac13368e.ngrok.io/siamproject-dbffa/us-central1/api/confirmpayment?userId=${userId}&orderId=${orderId}&amount=${totalPrice}&keys=${paymentKey}`,
         }
       }
       let res = await linePay.request(order)
