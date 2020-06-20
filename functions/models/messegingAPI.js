@@ -84,7 +84,7 @@ class messegingAPI {
                         "action": {
                           "type": "uri",
                           "label": "View Detail",
-                          "uri": `https://liff.line.me/1654085729-19prnAVz/?id=${v.product_id}`
+                          "uri": `https://liff.line.me/1654339351-WQLYke4a/?id=${v.product_id}`
                         },
                         "height": "sm",
                         "color": "#FFFFFF"
@@ -675,7 +675,7 @@ class messegingAPI {
           }
         ],
         redirectUrls: {
-          confirmUrl: `https://852aac13368e.ngrok.io/siamproject-dbffa/us-central1/api/confirmpayment?userId=${userId}&orderId=${orderId}&amount=${totalPrice}&keys=${paymentKey}`,
+          confirmUrl: `https://asia-east2-finalproject-9b5e9.cloudfunctions.net/api/confirmpayment?userId=${userId}&orderId=${orderId}&amount=${totalPrice}&keys=${paymentKey}`,
         }
       }
       let res = await linePay.request(order)
