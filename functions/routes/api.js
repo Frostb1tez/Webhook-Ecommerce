@@ -9,6 +9,7 @@ const router = express.Router()
 const userControllers = require('../controllers/userControllers');
 const productControllers = require('../controllers/productControllers')
 const cartControllers = require('../controllers/cartControllers')
+const orderControllers = require('../controllers/orderControllers')
 
 router.post('/adduser',userControllers.adduser)
 
@@ -46,8 +47,10 @@ router.post('/confirmcart',cartControllers.confirmcart)
 
 router.post('/confirmorder',cartControllers.confirmorder)
 
-router.get('/gettotalorder',cartControllers.gettotalorder)
-
 router.get('/confirmpayment', cartControllers.confirmpayment)
+
+router.get('/gettotalorder',orderControllers.gettotalorder)
+
+router.post('/edittrackid',orderControllers.editTrackOrderId)
 
 module.exports = router

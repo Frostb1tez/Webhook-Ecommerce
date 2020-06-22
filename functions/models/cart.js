@@ -117,6 +117,7 @@ class Cart {
         totalPrice: totalPrice
       }, { merge: true })
       await db.collection('so').doc(transactionId).set({
+        trackingId: 'กำลังอยู่ในระหว่างการจัดเตรียมสินค้า',
         tokenId: userId,
         product: product,
         totalPrice: totalPrice
