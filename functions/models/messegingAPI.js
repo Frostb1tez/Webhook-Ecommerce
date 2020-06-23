@@ -724,6 +724,744 @@ class messegingAPI {
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////
+  async tracking () {
+    let self = this
+    try {
+      let jsonPayload = {
+        "type": "flex",
+        "altText": "ติดตามพัสดุ",
+        "contents": {
+          "type": "bubble",
+          "size": "mega",
+          "header": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "เลขที่พัสดุ",
+                    "color": "#ffffff66",
+                    "size": "sm"
+                  },
+                  {
+                    "type": "text",
+                    "text": "RF900402998TH",
+                    "color": "#ffffff",
+                    "size": "xl",
+                    "flex": 4,
+                    "weight": "bold"
+                  }
+                ]
+              }
+            ],
+            "paddingAll": "20px",
+            "backgroundColor": "#0367D3",
+            "spacing": "md",
+            "height": "100px",
+            "paddingTop": "22px"
+          },
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Jul 19, 2019",
+                    "size": "sm",
+                    "gravity": "center",
+                    "align": "end"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "filler"
+                      },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "📄"
+                          }
+                        ],
+                        "cornerRadius": "30px",
+                        "height": "20px",
+                        "width": "20px",
+                        "offsetStart": "7px"
+                      },
+                      {
+                        "type": "filler"
+                      }
+                    ],
+                    "flex": 0,
+                    "backgroundColor": "#848484",
+                    "width": "30px",
+                    "height": "30px",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "รับฝาก",
+                    "gravity": "center",
+                    "flex": 1,
+                    "size": "sm"
+                  }
+                ],
+                "spacing": "lg",
+                "cornerRadius": "30px",
+                "margin": "xl"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "18:12:26",
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "align": "end"
+                      }
+                    ],
+                    "flex": 2
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                          {
+                            "type": "filler"
+                          },
+                          {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                              {
+                                "type": "filler"
+                              }
+                            ],
+                            "width": "2px",
+                            "backgroundColor": "#B7B7B7"
+                          },
+                          {
+                            "type": "filler"
+                          }
+                        ],
+                        "flex": 1
+                      }
+                    ],
+                    "width": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "คต. กาดสวนแก้ว",
+                    "gravity": "top",
+                    "flex": 2,
+                    "size": "xs",
+                    "color": "#8c8c8c"
+                  }
+                ],
+                "spacing": "lg",
+                "height": "40px"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Jul 20, 2019",
+                    "size": "sm",
+                    "gravity": "center",
+                    "align": "end"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "filler"
+                      },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "🚚"
+                          }
+                        ],
+                        "cornerRadius": "30px",
+                        "height": "20px",
+                        "width": "20px",
+                        "offsetStart": "7px"
+                      },
+                      {
+                        "type": "filler"
+                      }
+                    ],
+                    "flex": 0,
+                    "backgroundColor": "#A9D0F5",
+                    "width": "30px",
+                    "height": "30px",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "กำลังขนส่ง",
+                    "gravity": "center",
+                    "flex": 1,
+                    "size": "xs"
+                  }
+                ],
+                "cornerRadius": "30px",
+                "spacing": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "15:12:26",
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "align": "end"
+                      }
+                    ],
+                    "flex": 2
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                          {
+                            "type": "filler"
+                          },
+                          {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                              {
+                                "type": "filler"
+                              }
+                            ],
+                            "width": "2px",
+                            "backgroundColor": "#B7B7B7"
+                          },
+                          {
+                            "type": "filler"
+                          }
+                        ],
+                        "flex": 1
+                      }
+                    ],
+                    "width": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "คต. กาดสวนแก้ว",
+                    "gravity": "top",
+                    "flex": 2,
+                    "size": "xs",
+                    "color": "#8c8c8c"
+                  }
+                ],
+                "spacing": "lg",
+                "height": "40px"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Jul 20, 2019",
+                    "size": "sm",
+                    "gravity": "center",
+                    "align": "end"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "filler"
+                      },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "🚚"
+                          }
+                        ],
+                        "cornerRadius": "30px",
+                        "height": "20px",
+                        "width": "20px",
+                        "offsetStart": "7px"
+                      },
+                      {
+                        "type": "filler"
+                      }
+                    ],
+                    "flex": 0,
+                    "backgroundColor": "#A9D0F5",
+                    "width": "30px",
+                    "height": "30px",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "กำลังขนส่ง",
+                    "gravity": "center",
+                    "flex": 1,
+                    "size": "xs"
+                  }
+                ],
+                "cornerRadius": "30px",
+                "spacing": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "19:34:00",
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "align": "end"
+                      }
+                    ],
+                    "flex": 2
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                          {
+                            "type": "filler"
+                          },
+                          {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                              {
+                                "type": "filler"
+                              }
+                            ],
+                            "width": "2px",
+                            "backgroundColor": "#B7B7B7"
+                          },
+                          {
+                            "type": "filler"
+                          }
+                        ],
+                        "flex": 1
+                      }
+                    ],
+                    "width": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "ศป. ลำพูน",
+                    "gravity": "top",
+                    "flex": 2,
+                    "size": "xs",
+                    "color": "#8c8c8c"
+                  }
+                ],
+                "spacing": "lg",
+                "height": "40px"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Jul 22, 2019",
+                    "size": "sm",
+                    "gravity": "center",
+                    "align": "end"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "filler"
+                      },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "🚚"
+                          }
+                        ],
+                        "cornerRadius": "30px",
+                        "height": "20px",
+                        "width": "20px",
+                        "offsetStart": "7px"
+                      },
+                      {
+                        "type": "filler"
+                      }
+                    ],
+                    "flex": 0,
+                    "backgroundColor": "#A9D0F5",
+                    "width": "30px",
+                    "height": "30px",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "กำลังขนส่ง",
+                    "gravity": "center",
+                    "flex": 1,
+                    "size": "xs"
+                  }
+                ],
+                "cornerRadius": "30px",
+                "spacing": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "02:27:46",
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "align": "end"
+                      }
+                    ],
+                    "flex": 2
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                          {
+                            "type": "filler"
+                          },
+                          {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                              {
+                                "type": "filler"
+                              }
+                            ],
+                            "width": "2px",
+                            "backgroundColor": "#B7B7B7"
+                          },
+                          {
+                            "type": "filler"
+                          }
+                        ],
+                        "flex": 1
+                      }
+                    ],
+                    "width": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "ศป. อยุธยา",
+                    "gravity": "top",
+                    "flex": 2,
+                    "size": "xs",
+                    "color": "#8c8c8c"
+                  }
+                ],
+                "spacing": "lg",
+                "height": "40px"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Jul 22, 2019",
+                    "size": "sm",
+                    "gravity": "center",
+                    "align": "end"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "filler"
+                      },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "📦"
+                          }
+                        ],
+                        "cornerRadius": "30px",
+                        "height": "20px",
+                        "width": "20px",
+                        "offsetStart": "7px"
+                      },
+                      {
+                        "type": "filler"
+                      }
+                    ],
+                    "flex": 0,
+                    "backgroundColor": "#F6E3CE",
+                    "width": "30px",
+                    "height": "30px",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "กำลังนำจ่าย",
+                    "gravity": "center",
+                    "flex": 1,
+                    "size": "xs"
+                  }
+                ],
+                "cornerRadius": "30px",
+                "spacing": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "11:09:07",
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "align": "end"
+                      }
+                    ],
+                    "flex": 2
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                          {
+                            "type": "filler"
+                          },
+                          {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                              {
+                                "type": "filler"
+                              }
+                            ],
+                            "width": "2px",
+                            "backgroundColor": "#B7B7B7"
+                          },
+                          {
+                            "type": "filler"
+                          }
+                        ],
+                        "flex": 1
+                      }
+                    ],
+                    "width": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "หันคา",
+                    "gravity": "top",
+                    "flex": 2,
+                    "size": "xs",
+                    "color": "#8c8c8c"
+                  }
+                ],
+                "spacing": "lg",
+                "height": "40px"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "Jul 22, 2019",
+                    "size": "sm",
+                    "gravity": "center",
+                    "align": "end"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "filler"
+                      },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                          {
+                            "type": "text",
+                            "text": "✔️"
+                          }
+                        ],
+                        "cornerRadius": "30px",
+                        "height": "20px",
+                        "width": "20px",
+                        "offsetStart": "7px"
+                      },
+                      {
+                        "type": "filler"
+                      }
+                    ],
+                    "flex": 0,
+                    "backgroundColor": "#CEF6CE",
+                    "width": "30px",
+                    "height": "30px",
+                    "cornerRadius": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "นำจ่ายสำเร็จ",
+                    "gravity": "center",
+                    "flex": 1,
+                    "size": "xs"
+                  }
+                ],
+                "cornerRadius": "30px",
+                "spacing": "lg"
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "baseline",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "11:59:50",
+                        "size": "xs",
+                        "color": "#8c8c8c",
+                        "align": "end"
+                      }
+                    ],
+                    "flex": 2
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "box",
+                        "layout": "horizontal",
+                        "contents": [
+                          {
+                            "type": "filler"
+                          },
+                          {
+                            "type": "box",
+                            "layout": "vertical",
+                            "contents": [
+                              {
+                                "type": "filler"
+                              }
+                            ],
+                            "width": "2px"
+                          },
+                          {
+                            "type": "filler"
+                          }
+                        ],
+                        "flex": 1
+                      }
+                    ],
+                    "width": "30px"
+                  },
+                  {
+                    "type": "text",
+                    "text": "หันคา",
+                    "gravity": "top",
+                    "flex": 2,
+                    "size": "xs",
+                    "color": "#8c8c8c"
+                  }
+                ],
+                "spacing": "lg",
+                "height": "20px"
+              }
+            ]
+          }
+        }
+      }
+      return jsonPayload
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////
   async sendMessage (data,replyToken) {
     try {
       axios({
@@ -797,7 +1535,46 @@ class messegingAPI {
       data: JSON.stringify(this.data.body)
     })
   }
+///////////////////////////////////////////////////////////////////////////////////
+  async changeRichmenu (userId,replyToken) {
+    let self = this
+    try{
+      let d = await axios({
+        method: 'post',
+        url: `https://api.line.me/v2/bot/user/${userId}/richmenu/richmenu-8af34affdc2129cfb2b2efa1e60ad049`,
+        headers: {
+          'Content-Type': process.env.LINE_HEADER_CONTENTTYPE,
+          'Authorization': process.env.LINE_HEADER_AUTH
+        },
+        body: JSON.stringify({
+          richMenuId: "richmenu-8af34affdc2129cfb2b2efa1e60ad049",
+          userId: userId
+        })
+      })
+      self.sendMessage('กดที่ Menu เพื่อเข้าสู่ระบบ',replyToken)
+    } catch (e) {
+      console.log(e)
+      self.sendMessage('ไม่สามารถเชื่อมต่อเซิฟเวอร์ได้',replyToken)
+    }
+  }
 //////////////////////////////////////////////////////////////////////////////////////////
+  async deleteRichmenu (userId, replyToken) {
+    let self = this
+    try{
+      let d = await axios({
+        method: 'delete',
+        url: `https://api.line.me/v2/bot/user/${userId}/richmenu`,
+        headers: {
+          'Content-Type': process.env.LINE_HEADER_CONTENTTYPE,
+          'Authorization': process.env.LINE_HEADER_AUTH
+        }
+      })
+    } catch (e) {
+      console.log(e)
+      self.sendMessage('ไม่สามารถเชื่อมต่อเซิฟเวอร์ได้', replyToken)
+    }
+  }
+//////////////////////////////////////////////////////////////////////////////////////
   async cancelOrder (orderId,userId) {
     var self = this
     const replyToken = self.data.body.events[0].replyToken

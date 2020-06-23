@@ -121,16 +121,28 @@ class Product {
 
   async editproduct () {
     try {
-      await db.collection('product').doc(this.id).set({
-        product_id: this.id,
-        product_name: this.product_name,
-        product_type: this.product_type,
-        product_price: this.product_price,
-        product_image: this.product_image,
-        product_detail: this.product_detail,
-        product_stock: this.product_stock,
-        time_updated: FieldValue.serverTimestamp()
-      })
+      if (this.product_image === '') {
+        await db.collection('product').doc(this.id).set({
+          product_id: this.id,
+          product_name: this.product_name,
+          product_type: this.product_type,
+          product_price: this.product_price,
+          product_detail: this.product_detail,
+          product_stock: this.product_stock,
+          time_updated: FieldValue.serverTimestamp()
+        },{ merge: true })
+      } else {
+        await db.collection('product').doc(this.id).set({
+          product_id: this.id,
+          product_name: this.product_name,
+          product_type: this.product_type,
+          product_price: this.product_price,
+          product_image: this.product_image,
+          product_detail: this.product_detail,
+          product_stock: this.product_stock,
+          time_updated: FieldValue.serverTimestamp()
+        },{ merge: true })
+      }
       return true
     } catch (e) {
       console.log(e)

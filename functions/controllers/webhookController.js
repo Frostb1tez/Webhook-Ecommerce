@@ -8,7 +8,18 @@ exports.webhook = async (req,res) =>{
   const userId = event.source.userId
   switch (event.type) {
     case 'message' :
-      await message.postToDialogflow()
+      if (event.message.text === '#admin') {
+        message.changeRichmenu(userId,event.replyToken)
+      } else if (event.message.text === '#user') {
+        message.deleteRichmenu(userId,event.replyToken)
+      } else if (event.message.text === 'เช็คสถานะ') {
+        // message.tracking()
+        let d = await message.tracking()
+        message.sendPayload(d,event.replyToken)
+        // console.log(event)
+      } else {
+        await message.postToDialogflow()
+      }
       res.sendStatus(200)
     break
     case 'postback' :
