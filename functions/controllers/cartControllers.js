@@ -82,7 +82,8 @@ exports.confirmpayment = async (req,res) => {
   const cart = new Cart(req.body)
   const data = await cart.confirmpayment(req.query)
   const message = new Message()
-  await message.pushMessage(`เลขคำสั่งซื้อของคุณคือ: ${data.info.transactionId}`, req.query.userId)
+  let d = await message.sendFlexOrder(data.info.transactionId)
+  await message.pushMessage(d,req.query.userId)
   res.send(data.returnMessage).status(200).end()
 }
 

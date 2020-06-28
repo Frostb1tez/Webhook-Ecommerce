@@ -2,6 +2,7 @@ const axios = require('axios')
 const admin = require('firebase-admin')
 const db = admin.firestore();
 const LinePay = require("./linePayService")
+const https = require('https')
 
 class messegingAPI {
   constructor(data) {
@@ -395,7 +396,7 @@ class messegingAPI {
   async getHistory (userId) {
     var self = this
     try {
-      let d = await db.collection('users').doc(userId).collection('so').get()
+      let d = await db.collection('users').doc(userId).collection('so').orderBy("time_created", "desc").get()
       let orderId = d.docs.map(doc => doc.id)
       if (orderId.length !== 0) {
         let items = []
@@ -412,6 +413,46 @@ class messegingAPI {
         return {
           "type": "text",
           "text": "นี่คือรายการประวัติการสั่งซื้อของคุณทั้งหมด",
+          "quickReply": {
+          "items": items
+          }
+        }
+      } else {
+        return {
+          "type": "text",
+          "text": "ไม่มีประวัติการสั่งซื้อ"
+        }
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  async getTrackingByOrderID (userId) {
+    var self = this
+    try {
+      let d = await db.collection('so').where('tokenId', '==', userId).orderBy("time_created", "desc").get()
+      let data = d.docs.map(doc => {
+        return {
+          id: doc.id,
+          trackingId: doc.data().trackingId
+        }
+      })
+      if (data.length !== 0) {
+        let items = []
+        data.forEach(v => {
+          items.push({
+            "type": "action",
+            "action": {
+            "type": "postback",
+            "label": v.id.toString(),
+            "data": `tracking/?trackingId=${v.trackingId.toString()}`
+            }
+          })
+        })
+        return {
+          "type": "text",
+          "text": "เลือกรายการ",
           "quickReply": {
           "items": items
           }
@@ -471,7 +512,7 @@ class messegingAPI {
             "contents": [
               {
                 "type": "text",
-                "text": "Quatation Order",
+                "text": "Sale Order",
                 "weight": "bold",
                 "color": "#1DB446",
                 "size": "sm"
@@ -724,739 +765,361 @@ class messegingAPI {
     }
   }
   ///////////////////////////////////////////////////////////////////////////////////////////
-  async tracking () {
+  async tracking (trackingId) {
     let self = this
+    let content = []
+    const replyToken = self.data.body.events[0].replyToken
     try {
-      let jsonPayload = {
-        "type": "flex",
-        "altText": "ติดตามพัสดุ",
-        "contents": {
-          "type": "bubble",
-          "size": "mega",
-          "header": {
+      process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+      let d = await axios({
+        method: 'post',
+        url: `${process.env.THAIPOST_API}`,
+        headers: {
+          'Content-Type': process.env.LINE_HEADER_CONTENTTYPE,
+          'Authorization': process.env.THAIPOST_AUTH
+        },
+        data: JSON.stringify({
+          "status": "all",
+          "language": "TH",
+          "barcode": [
+            trackingId
+         ]
+        }),
+      })
+      const data = d.data.response.items
+      let key = Object.keys(data)
+      if (data[key[0]].length > 0) {
+        data[key[0]].forEach(v => {
+          const statusDate = v.status_date.split(' ')[0]
+          const time = v.status_date.split(' ')[1].split('+')[0]
+          let icon = {
             "type": "box",
             "layout": "vertical",
             "contents": [
+              {
+                "type": "filler"
+              },
               {
                 "type": "box",
                 "layout": "vertical",
                 "contents": [
                   {
                     "type": "text",
-                    "text": "เลขที่พัสดุ",
-                    "color": "#ffffff66",
-                    "size": "sm"
-                  },
-                  {
-                    "type": "text",
-                    "text": "RF900402998TH",
-                    "color": "#ffffff",
-                    "size": "xl",
-                    "flex": 4,
-                    "weight": "bold"
+                    "text": "📄"
                   }
-                ]
+                ],
+                "cornerRadius": "30px",
+                "height": "20px",
+                "width": "20px",
+                "offsetStart": "7px"
+              },
+              {
+                "type": "filler"
               }
             ],
-            "paddingAll": "20px",
-            "backgroundColor": "#0367D3",
-            "spacing": "md",
-            "height": "100px",
-            "paddingTop": "22px"
-          },
-          "body": {
+            "flex": 0,
+            "backgroundColor": "#848484",
+            "width": "30px",
+            "height": "30px",
+            "cornerRadius": "30px"
+          }
+          let lifeLine = [
+            {
+              "type": "box",
+              "layout": "horizontal",
+              "contents": [
+                {
+                  "type": "filler"
+                },
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "contents": [
+                    {
+                      "type": "filler"
+                    }
+                  ],
+                  "width": "2px",
+                  "backgroundColor": "#B7B7B7"
+                },
+                {
+                  "type": "filler"
+                }
+              ],
+              "flex": 1
+            }
+          ]
+          switch (v.status) {
+            case '501' :
+              icon = {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "✔️"
+                      }
+                    ],
+                    "cornerRadius": "30px",
+                    "height": "20px",
+                    "width": "20px",
+                    "offsetStart": "7px"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 0,
+                "backgroundColor": "#CEF6CE",
+                "width": "30px",
+                "height": "30px",
+                "cornerRadius": "30px"
+              }
+              lifeLine = [
+                {
+                  "type": "box",
+                  "layout": "horizontal",
+                  "contents": [
+                    {
+                      "type": "filler"
+                    },
+                    {
+                      "type": "box",
+                      "layout": "vertical",
+                      "contents": [
+                        {
+                          "type": "filler"
+                        }
+                      ],
+                      "width": "2px"
+                    },
+                    {
+                      "type": "filler"
+                    }
+                  ],
+                  "flex": 1
+                }
+              ]
+            break
+            case '201' :
+              icon = {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "🚚"
+                      }
+                    ],
+                    "cornerRadius": "30px",
+                    "height": "20px",
+                    "width": "20px",
+                    "offsetStart": "7px"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 0,
+                "backgroundColor": "#A9D0F5",
+                "width": "30px",
+                "height": "30px",
+                "cornerRadius": "30px"
+              }
+            break
+            case '401' :
+              icon = {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "❌"
+                      }
+                    ],
+                    "cornerRadius": "30px",
+                    "height": "20px",
+                    "width": "20px",
+                    "offsetStart": "7px"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 0,
+                "backgroundColor": "#848484",
+                "width": "30px",
+                "height": "30px",
+                "cornerRadius": "30px"
+              }
+            break
+            case '301' :
+              icon = {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                      {
+                        "type": "text",
+                        "text": "📦"
+                      }
+                    ],
+                    "cornerRadius": "30px",
+                    "height": "20px",
+                    "width": "20px",
+                    "offsetStart": "7px"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 0,
+                "backgroundColor": "#F6E3CE",
+                "width": "30px",
+                "height": "30px",
+                "cornerRadius": "30px"
+              }
+            break
+          }
+          content.push({
             "type": "box",
-            "layout": "vertical",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "text",
+                "text": statusDate,
+                "size": "sm",
+                "gravity": "center",
+                "align": "end"
+              },
+              icon
+              ,
+              {
+                "type": "text",
+                "text": v.status_description,
+                "gravity": "center",
+                "flex": 1,
+                "size": "sm",
+                "wrap": true
+              }
+            ],
+            "spacing": "lg",
+            "cornerRadius": "30px",
+            "margin": "xl"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
             "contents": [
               {
                 "type": "box",
-                "layout": "horizontal",
+                "layout": "baseline",
                 "contents": [
                   {
                     "type": "text",
-                    "text": "Jul 19, 2019",
-                    "size": "sm",
-                    "gravity": "center",
-                    "align": "end"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "📄"
-                          }
-                        ],
-                        "cornerRadius": "30px",
-                        "height": "20px",
-                        "width": "20px",
-                        "offsetStart": "7px"
-                      },
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "flex": 0,
-                    "backgroundColor": "#848484",
-                    "width": "30px",
-                    "height": "30px",
-                    "cornerRadius": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "รับฝาก",
-                    "gravity": "center",
-                    "flex": 1,
-                    "size": "sm"
-                  }
-                ],
-                "spacing": "lg",
-                "cornerRadius": "30px",
-                "margin": "xl"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "18:12:26",
-                        "size": "xs",
-                        "color": "#8c8c8c",
-                        "align": "end"
-                      }
-                    ],
-                    "flex": 2
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "horizontal",
-                        "contents": [
-                          {
-                            "type": "filler"
-                          },
-                          {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                              {
-                                "type": "filler"
-                              }
-                            ],
-                            "width": "2px",
-                            "backgroundColor": "#B7B7B7"
-                          },
-                          {
-                            "type": "filler"
-                          }
-                        ],
-                        "flex": 1
-                      }
-                    ],
-                    "width": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "คต. กาดสวนแก้ว",
-                    "gravity": "top",
-                    "flex": 2,
+                    "text": time,
                     "size": "xs",
-                    "color": "#8c8c8c"
-                  }
-                ],
-                "spacing": "lg",
-                "height": "40px"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "Jul 20, 2019",
-                    "size": "sm",
-                    "gravity": "center",
+                    "color": "#8c8c8c",
                     "align": "end"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "🚚"
-                          }
-                        ],
-                        "cornerRadius": "30px",
-                        "height": "20px",
-                        "width": "20px",
-                        "offsetStart": "7px"
-                      },
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "flex": 0,
-                    "backgroundColor": "#A9D0F5",
-                    "width": "30px",
-                    "height": "30px",
-                    "cornerRadius": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "กำลังขนส่ง",
-                    "gravity": "center",
-                    "flex": 1,
-                    "size": "xs"
                   }
                 ],
-                "cornerRadius": "30px",
-                "spacing": "lg"
+                "flex": 2
               },
               {
                 "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "15:12:26",
-                        "size": "xs",
-                        "color": "#8c8c8c",
-                        "align": "end"
-                      }
-                    ],
-                    "flex": 2
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "horizontal",
-                        "contents": [
-                          {
-                            "type": "filler"
-                          },
-                          {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                              {
-                                "type": "filler"
-                              }
-                            ],
-                            "width": "2px",
-                            "backgroundColor": "#B7B7B7"
-                          },
-                          {
-                            "type": "filler"
-                          }
-                        ],
-                        "flex": 1
-                      }
-                    ],
-                    "width": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "คต. กาดสวนแก้ว",
-                    "gravity": "top",
-                    "flex": 2,
-                    "size": "xs",
-                    "color": "#8c8c8c"
-                  }
-                ],
-                "spacing": "lg",
-                "height": "40px"
+                "layout": "vertical",
+                "contents": lifeLine,
+                "width": "30px"
               },
               {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "Jul 20, 2019",
-                    "size": "sm",
-                    "gravity": "center",
-                    "align": "end"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "🚚"
-                          }
-                        ],
-                        "cornerRadius": "30px",
-                        "height": "20px",
-                        "width": "20px",
-                        "offsetStart": "7px"
-                      },
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "flex": 0,
-                    "backgroundColor": "#A9D0F5",
-                    "width": "30px",
-                    "height": "30px",
-                    "cornerRadius": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "กำลังขนส่ง",
-                    "gravity": "center",
-                    "flex": 1,
-                    "size": "xs"
-                  }
-                ],
-                "cornerRadius": "30px",
-                "spacing": "lg"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "19:34:00",
-                        "size": "xs",
-                        "color": "#8c8c8c",
-                        "align": "end"
-                      }
-                    ],
-                    "flex": 2
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "horizontal",
-                        "contents": [
-                          {
-                            "type": "filler"
-                          },
-                          {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                              {
-                                "type": "filler"
-                              }
-                            ],
-                            "width": "2px",
-                            "backgroundColor": "#B7B7B7"
-                          },
-                          {
-                            "type": "filler"
-                          }
-                        ],
-                        "flex": 1
-                      }
-                    ],
-                    "width": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "ศป. ลำพูน",
-                    "gravity": "top",
-                    "flex": 2,
-                    "size": "xs",
-                    "color": "#8c8c8c"
-                  }
-                ],
-                "spacing": "lg",
-                "height": "40px"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "Jul 22, 2019",
-                    "size": "sm",
-                    "gravity": "center",
-                    "align": "end"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "🚚"
-                          }
-                        ],
-                        "cornerRadius": "30px",
-                        "height": "20px",
-                        "width": "20px",
-                        "offsetStart": "7px"
-                      },
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "flex": 0,
-                    "backgroundColor": "#A9D0F5",
-                    "width": "30px",
-                    "height": "30px",
-                    "cornerRadius": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "กำลังขนส่ง",
-                    "gravity": "center",
-                    "flex": 1,
-                    "size": "xs"
-                  }
-                ],
-                "cornerRadius": "30px",
-                "spacing": "lg"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "02:27:46",
-                        "size": "xs",
-                        "color": "#8c8c8c",
-                        "align": "end"
-                      }
-                    ],
-                    "flex": 2
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "horizontal",
-                        "contents": [
-                          {
-                            "type": "filler"
-                          },
-                          {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                              {
-                                "type": "filler"
-                              }
-                            ],
-                            "width": "2px",
-                            "backgroundColor": "#B7B7B7"
-                          },
-                          {
-                            "type": "filler"
-                          }
-                        ],
-                        "flex": 1
-                      }
-                    ],
-                    "width": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "ศป. อยุธยา",
-                    "gravity": "top",
-                    "flex": 2,
-                    "size": "xs",
-                    "color": "#8c8c8c"
-                  }
-                ],
-                "spacing": "lg",
-                "height": "40px"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "Jul 22, 2019",
-                    "size": "sm",
-                    "gravity": "center",
-                    "align": "end"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "📦"
-                          }
-                        ],
-                        "cornerRadius": "30px",
-                        "height": "20px",
-                        "width": "20px",
-                        "offsetStart": "7px"
-                      },
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "flex": 0,
-                    "backgroundColor": "#F6E3CE",
-                    "width": "30px",
-                    "height": "30px",
-                    "cornerRadius": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "กำลังนำจ่าย",
-                    "gravity": "center",
-                    "flex": 1,
-                    "size": "xs"
-                  }
-                ],
-                "cornerRadius": "30px",
-                "spacing": "lg"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "11:09:07",
-                        "size": "xs",
-                        "color": "#8c8c8c",
-                        "align": "end"
-                      }
-                    ],
-                    "flex": 2
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "horizontal",
-                        "contents": [
-                          {
-                            "type": "filler"
-                          },
-                          {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                              {
-                                "type": "filler"
-                              }
-                            ],
-                            "width": "2px",
-                            "backgroundColor": "#B7B7B7"
-                          },
-                          {
-                            "type": "filler"
-                          }
-                        ],
-                        "flex": 1
-                      }
-                    ],
-                    "width": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "หันคา",
-                    "gravity": "top",
-                    "flex": 2,
-                    "size": "xs",
-                    "color": "#8c8c8c"
-                  }
-                ],
-                "spacing": "lg",
-                "height": "40px"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "text",
-                    "text": "Jul 22, 2019",
-                    "size": "sm",
-                    "gravity": "center",
-                    "align": "end"
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [
-                          {
-                            "type": "text",
-                            "text": "✔️"
-                          }
-                        ],
-                        "cornerRadius": "30px",
-                        "height": "20px",
-                        "width": "20px",
-                        "offsetStart": "7px"
-                      },
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "flex": 0,
-                    "backgroundColor": "#CEF6CE",
-                    "width": "30px",
-                    "height": "30px",
-                    "cornerRadius": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "นำจ่ายสำเร็จ",
-                    "gravity": "center",
-                    "flex": 1,
-                    "size": "xs"
-                  }
-                ],
-                "cornerRadius": "30px",
-                "spacing": "lg"
-              },
-              {
-                "type": "box",
-                "layout": "horizontal",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "baseline",
-                    "contents": [
-                      {
-                        "type": "text",
-                        "text": "11:59:50",
-                        "size": "xs",
-                        "color": "#8c8c8c",
-                        "align": "end"
-                      }
-                    ],
-                    "flex": 2
-                  },
-                  {
-                    "type": "box",
-                    "layout": "vertical",
-                    "contents": [
-                      {
-                        "type": "box",
-                        "layout": "horizontal",
-                        "contents": [
-                          {
-                            "type": "filler"
-                          },
-                          {
-                            "type": "box",
-                            "layout": "vertical",
-                            "contents": [
-                              {
-                                "type": "filler"
-                              }
-                            ],
-                            "width": "2px"
-                          },
-                          {
-                            "type": "filler"
-                          }
-                        ],
-                        "flex": 1
-                      }
-                    ],
-                    "width": "30px"
-                  },
-                  {
-                    "type": "text",
-                    "text": "หันคา",
-                    "gravity": "top",
-                    "flex": 2,
-                    "size": "xs",
-                    "color": "#8c8c8c"
-                  }
-                ],
-                "spacing": "lg",
-                "height": "20px"
+                "type": "text",
+                "text": v.location,
+                "gravity": "top",
+                "flex": 2,
+                "size": "xs",
+                "color": "#8c8c8c"
               }
-            ]
+            ],
+            "spacing": "lg",
+            "height": "40px"
+          })
+        })
+        let jsonPayload = {
+          "type": "flex",
+          "altText": "ติดตามพัสดุ",
+          "contents": {
+            "type": "bubble",
+            "size": "mega",
+            "header": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": [
+                {
+                  "type": "box",
+                  "layout": "vertical",
+                  "contents": [
+                    {
+                      "type": "text",
+                      "text": "เลขที่พัสดุ",
+                      "color": "#ffffff66",
+                      "size": "sm"
+                    },
+                    {
+                      "type": "text",
+                      "text": trackingId,
+                      "color": "#ffffff",
+                      "size": "xl",
+                      "flex": 4,
+                      "weight": "bold"
+                    }
+                  ]
+                }
+              ],
+              "paddingAll": "20px",
+              "backgroundColor": "#0367D3",
+              "spacing": "md",
+              "height": "100px",
+              "paddingTop": "22px"
+            },
+            "body": {
+              "type": "box",
+              "layout": "vertical",
+              "contents": content
+            }
           }
         }
+        return jsonPayload
+      } else {
+        self.sendMessage('เกิดข้อผิดพลาดไม่พบหมายเลขไปรษณีย์',replyToken)
       }
-      return jsonPayload
+      
     } catch (e) {
       console.log(e)
     }
@@ -1495,12 +1158,54 @@ class messegingAPI {
         },
         data: JSON.stringify({
           to: userid,
-          messages: [{
-            "type": "text",
-            "text": data
-        }]
+          messages: data
         })
       })
+    } catch (e) {
+      console.log(e)
+    }
+  }
+  ///////////////////////////////////////////////////////////////////////////////////////////
+  async sendFlexOrder (id) {
+    try {
+      let jsonPayload = [{
+        "type": "flex",
+        "altText": "หมายเลขคำสั่งซื้อ",
+        "contents": {
+          "type": "bubble",
+          "body": {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "text",
+                "text": "รายการคำสั่งซื้อของคุณเลขที่",
+                "size": "md",
+                "align": "center"
+              },
+              {
+                "type": "text",
+                "text": id.toString(),
+                "size": "md",
+                "align": "center",
+                "weight": "bold",
+                "color": "#00008B"
+              },
+              {
+                "type": "button",
+                "action": {
+                  "type": "postback",
+                  "label": "View Detail",
+                  "data": `history/?saleorderId=${id.toString()}`
+                },
+                "style": "primary",
+                "margin": "xl"
+              }
+            ]
+          }
+        }
+      }]
+      return jsonPayload
     } catch (e) {
       console.log(e)
     }

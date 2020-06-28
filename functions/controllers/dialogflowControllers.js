@@ -24,6 +24,19 @@ exports.webhook = async (req,res) =>{
     })
   }
 
+  function Tracking (agent) {
+    const userId = agent.originalRequest.payload.data.source.userId
+    return message.getTrackingByOrderID(userId)
+    .then(d => {
+      if (d.status === 404) {
+        agent.add(d.messege)
+      } else {
+        let payload = new Payload(`LINE`, d, { sendAsMessage: true });
+        agent.add(payload)
+      }
+    })
+  }
+
   function getHistory (agent) {
     const userId = agent.originalRequest.payload.data.source.userId
     return message.getHistory(userId)
@@ -41,5 +54,6 @@ exports.webhook = async (req,res) =>{
   intentMap.set('Product', getProduct)
   intentMap.set('Order', getOrder)
   intentMap.set('History', getHistory)
+  intentMap.set('Tracking', Tracking)
   agent.handleRequest(intentMap)
 }

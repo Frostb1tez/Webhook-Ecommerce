@@ -60,7 +60,8 @@ class Cart {
           product: this.cart.product,
           totalPrice: this.totalPrice,
           contact: this.contact,
-          address: this.address
+          address: this.address,
+          time_created: FieldValue.serverTimestamp()
         }, { merge: true })
         let data = {
           status: 1,
@@ -114,13 +115,15 @@ class Cart {
       await db.collection('users').doc(userId).collection('qo').doc(orderId).delete()
       await db.collection('users').doc(userId).collection('so').doc(transactionId).set({
         product: product,
-        totalPrice: totalPrice
+        totalPrice: totalPrice,
+        time_created: FieldValue.serverTimestamp()
       }, { merge: true })
       await db.collection('so').doc(transactionId).set({
         trackingId: 'กำลังอยู่ในระหว่างการจัดเตรียมสินค้า',
         tokenId: userId,
         product: product,
-        totalPrice: totalPrice
+        totalPrice: totalPrice,
+        time_created: FieldValue.serverTimestamp()
       }, { merge: true })
     } catch (e) {
       console.log(e)
