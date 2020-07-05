@@ -10,8 +10,17 @@ const uuid = UUID()
 
 exports.getproducts =  async (req, res) => {
   const product = new Product(req.body)
-  const data = await product.getdata()
+  let data = await product.getdata()
   if (data) {
+    for (v of data) {
+      if(v.isPromotion === 1) {
+        let result = await product.checkDate(v.product_id,v.product_price)
+        if (result) {
+          v.oldPrice = v.product_price
+          v.product_price = result
+        }
+      }
+    }
     res.send({
       status: 200,
       message: 'success',

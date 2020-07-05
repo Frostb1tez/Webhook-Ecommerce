@@ -15,36 +15,43 @@ class Product {
 
   async getdata () {
     try {
-      let products = []
-      let productsArray = []
-      let i = 0
-      var querySnapshot = await db.collection('product').get()
-      querySnapshot.forEach(doc => {
-        productsArray.push(doc.data())
-        productsArray[i].id = doc.id
-        products.push(productsArray[i])
-        i++
+      let d = await db.collection('product').get()
+      let data = d.docs.map(doc => {
+        return doc.data()
       })
-      return products
+      return data
     } catch (e) {
       console.log(e)
       return e
     }
   }
 
+  async checkDate (id,price) {
+    let date = new Date().toISOString().slice(0,10).replace(/-/g, "/")
+    try {
+      let d = await db.collection('promotion').doc(id).get()
+      if (d.data().end_date >= date && d.data().start_date <= date) {
+        if (d.data().discount_type === '%') {
+          return price - (price * d.data().discount_price/100)
+        } else if (d.data().discount_type === 'THB') {
+          return price - d.data().discount_price
+        }
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
   async gettype () {
     try {
-      let type = []
-      let typeArr = []
-      let i = 0
-      var querySnapshot = await db.collection('producttype').get()
-      querySnapshot.forEach(doc => {
-        typeArr.push(doc.data())
-        typeArr[i].id = doc.id
-        type.push(typeArr[i])
-        i++
+      let d = await db.collection('producttype').get()
+      let data = d.docs.map(doc => {
+        return {
+          id: doc.id,
+          data: doc.data()
+        }
       })
-      return type
+      return data
     } catch (e) {
       console.log(e)
       return e
@@ -82,6 +89,7 @@ class Product {
         return false
       } else {
         db.collection('product').doc(this.id).set({
+          isPromotion: 0,
           product_id: this.id,
           product_name: this.product_name,
           product_type: this.product_type,

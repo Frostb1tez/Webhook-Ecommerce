@@ -10,6 +10,7 @@ const userControllers = require('../controllers/userControllers');
 const productControllers = require('../controllers/productControllers')
 const cartControllers = require('../controllers/cartControllers')
 const orderControllers = require('../controllers/orderControllers')
+const PromotionControllers = require('../controllers/promotionControllers')
 
 router.post('/adduser',userControllers.adduser)
 
@@ -52,5 +53,11 @@ router.get('/confirmpayment', cartControllers.confirmpayment)
 router.get('/gettotalorder',orderControllers.gettotalorder)
 
 router.post('/edittrackid',orderControllers.editTrackOrderId)
+
+router.post('/createpromotion',PromotionControllers.createpromotion)
+
+router.post('/deletepromotion',PromotionControllers.deletepromotion)
+
+router.get('/getpromotion',PromotionControllers.getpromotion)
 
 module.exports = router

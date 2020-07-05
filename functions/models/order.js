@@ -8,7 +8,7 @@ class Order {
   async getTotalOrder() {
     let self = this
     try{
-      let d = await db.collection('so').get()
+      let d = await db.collection('so').orderBy("time_created", "desc").get()
       let data = await Promise.all(d.docs.map(async (doc) => {
         return {
           id:doc.id,
