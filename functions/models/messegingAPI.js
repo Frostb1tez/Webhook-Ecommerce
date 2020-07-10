@@ -11,19 +11,16 @@ class messegingAPI {
   /////////////////////////////////////////////////////////////////////////////////////////////////
   async getproduct () {
     try {
-      let products = []
-      let productsArray = []
-      let i = 0
+      // let products = []
+      // let productsArray = []
+      // let i = 0
       let content = []
-      let querySnapshot = await db.collection('product').get()
-      querySnapshot.forEach(doc => {
-        productsArray.push(doc.data())
-        productsArray[i].id = doc.id
-        products.push(productsArray[i])
-        i++
+      let data = await axios({
+        method: 'get',
+        url: "https://asia-east2-finalproject-9b5e9.cloudfunctions.net/api/getproduct"
       })
-      products.forEach((v) => {
-        v.saleprice = v.product_price + 2000
+      let product = data.data.data
+      product.forEach((v) => {
         content.push({
           "type": "bubble",
           "body": {
@@ -67,7 +64,7 @@ class messegingAPI {
                       },
                       {
                         "type": "text",
-                        "text": v.saleprice.toLocaleString() + " THB",
+                        "text": v.oldPrice?v.oldPrice.toLocaleString() + " THB":' ',
                         "color": "#ffffffcc",
                         "decoration": "line-through",
                         "gravity": "bottom",
@@ -1210,6 +1207,56 @@ class messegingAPI {
       console.log(e)
     }
   }
+
+///////////////////////////////////////////////////////////////////////////////////////////
+async fallback (userId) {
+  var self = this
+  try {
+      return {
+        "type": "text",
+        "text": "ขอโทษนะคะ ยังไม่เข้าใจคำถาม ลองพิมพ์ใหม่อีกครั้ง หรือเลือกเมนูด้านล่างได้นะเลยค่ะ 🙇!",
+        "quickReply": {
+         "items": [
+          {
+            "type": "action",
+            "action": {
+             "type":"message",
+             "label":"ดูสินค้า",
+             "text":"สินค้า"
+            }
+          },
+          {
+            "type": "action",
+            "action": {
+             "type":"message",
+             "label":"ตะกร้าสินค้า",
+             "text":"ตะกร้าสินค้า"
+            }
+          },
+          {
+            "type": "action",
+            "action": {
+             "type":"message",
+             "label":"ประวัติการสั่งซื้อ",
+             "text":"ประวัติการสั่งซื้อ"
+            }
+          },
+          {
+            "type": "action",
+            "action": {
+             "type":"message",
+             "label":"ติดตามพัสดุ",
+             "text":"ติดตามพัสดุ"
+            }
+          }
+         ]
+        }
+      }
+    }
+  catch(e) {
+    console.log(e)
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
   async sendPayload (data,replyToken) {
     let self = this

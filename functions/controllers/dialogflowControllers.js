@@ -49,11 +49,24 @@ exports.webhook = async (req,res) =>{
       }
     })
   }
+  function fallBack (agent) {
+    const userId = agent.originalRequest.payload.data.source.userId
+    return message.fallback()
+    .then(d => {
+      if (d.status === 404) {
+        agent.add(d.messege)
+      } else {
+        let payload = new Payload(`LINE`, d, { sendAsMessage: true });
+        agent.add(payload)
+      }
+    })
+  }
 
   let intentMap = new Map()
   intentMap.set('Product', getProduct)
   intentMap.set('Order', getOrder)
   intentMap.set('History', getHistory)
   intentMap.set('Tracking', Tracking)
+  intentMap.set('Default Fallback Intent',fallBack)
   agent.handleRequest(intentMap)
 }
