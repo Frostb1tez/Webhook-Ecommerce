@@ -55,8 +55,15 @@ exports.getproductstype =  async (req, res) => {
 
 exports.getproductbyid = async (req, res) => {
   const product = new Product(req.body)
-  const data = await product.getdatabyid(req.params.id)
+  let data = await product.getdatabyid(req.params.id)
   if (data) {
+    if(data.isPromotion === 1) {
+      let result = await product.checkDate(data.product_id,data.product_price)
+      if (result) {
+        data.oldPrice = data.product_price
+        data.product_price = result
+      }
+    }
     res.send({
       status: 200,
       message: 'success',
@@ -174,7 +181,7 @@ exports.uploadimage = async (req , res) => {
   if (req.method === 'POST') {
     const busboy = new Busboy({ headers: req.headers });
     const uploads = {}
-
+    
     // This callback will be invoked for each file uploaded
     busboy.on('file', async (fieldname, file, filename, encoding, mimetype) => {
         // console.log(`File [${fieldname}] filename: ${filename}, encoding: ${encoding}, mimetype: ${mimetype}`);
