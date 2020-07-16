@@ -29,7 +29,7 @@ class messegingAPI {
             "contents": [
               {
                 "type": "image",
-                "url": v.product_image,
+                "url": v.product_image[0],
                 "size": "full",
                 "aspectMode": "cover",
                 "aspectRatio": "2:3",
@@ -697,7 +697,7 @@ class messegingAPI {
           name: v.product_name,
           quantity: v.product_amount,
           price: v.product_price,
-          imageUrl: v.product_image
+          imageUrl: v.product_image[0]
         })
       })
       const order = {
